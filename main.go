@@ -61,7 +61,6 @@ func unregisterHost(w http.ResponseWriter, r *http.Request) {
 }
 
 func getHost(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hello")
 	_ = r.ParseForm()
 
 	val, err := p.GetHost(r.Form["key"][0])

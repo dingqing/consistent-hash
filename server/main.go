@@ -16,7 +16,7 @@ type Server struct {
 var (
 	server = Server{KvMap: sync.Map{}}
 
-	port = flag.String("p", "8080", "port")
+	port = flag.String("p", "8081", "port")
 
 	regHost = "http://localhost:18888"
 

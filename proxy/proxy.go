@@ -2,10 +2,11 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/dingqing/consistent-hash/core"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/dingqing/consistent-hash/core"
 )
 
 type Proxy struct {

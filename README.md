@@ -31,23 +31,23 @@
 开启代理服务（18888端口）：
 go run main.go
 
-开启kv服务（默认8080端口）：
+开启kv服务（默认8081端口）：
 go run server/main.go
 可以开启更多kv服务：
-go run server/main.go -p 8081
 go run server/main.go -p 8082
+go run server/main.go -p 8083
 ...
 ```
 
 ### 检查服务响应
 ```shell
 查询不同的key，并在代理服务的日志中，检查响应是否来自不同的物理服务器：
-curl localhost:18888/host?key=123
-curl localhost:18888/host?key=4
+curl -i "http://localhost:18888/host?key=123"
+curl -i "http://localhost:18888/host?key=4"
 ...
 
 考虑服务器容量的一致性哈希：
-curl localhost:18888/hostCapacious?key=123
+curl -i "http://localhost:18888/hostCapacious?key=567"
 ```
 
 ### 配置
