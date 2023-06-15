@@ -27,15 +27,13 @@ type Consistent struct {
 	replicaNum int
 	totalLoad  int64
 	hashFunc   func(key string) uint64
-	hosts      map[uint64]*Host
+	hosts      map[string]*Host
 	virt2host  map[uint64]string
 	ring       []uint64
 	sync.RWMutex
 }
 
-func 
-
-(replicaNum int, hashFunc func(key string) uint64) *Consistent {
+func New(replicaNum int, hashFunc func(key string) uint64) *Consistent {
 	if replicaNum <= 0 {
 		replicaNum = defaultReplicaNum
 	}
@@ -45,12 +43,12 @@ func
 	}
 
 	return &Consistent{
-		replicaNum:         replicaNum,
-		totalLoad:          0,
-		hashFunc:           hashFunc,
-		hostMap:            make(map[string]*Host),
-		replicaHostMap:     make(map[uint64]string),
-		sortedHostsHashSet: make([]uint64, 0),
+		replicaNum: replicaNum,
+		totalLoad:  0,
+		hashFunc:   hashFunc,
+		hosts:      make(map[string]*Host),
+		virt2host:  make(map[uint64]string),
+		ring:       make([]uint64, 0),
 	}
 }
 func (c *Consistent) RegisterHost(hostName string) error {
@@ -66,7 +64,7 @@ func (c *Consistent) RegisterHost(hostName string) error {
 	}
 
 	for i := 0; i < c.replicaNum; i++ {
-		hashedIdx := c.hashFunc(fmt.Sprintf(hostReplicaNum, hostName, i))
+		hashedIdx := c.hashFunc(fmt.Sprintf(hostReplicaFormat, hostName, i))
 		c.virt2host[hashedIdx] = hostName
 		c.ring = append(c.ring, hashedIdx)
 	}
@@ -99,7 +97,7 @@ func (c *Consistent) UpdateLoad(host string, load int64) {
 	if _, ok := c.hosts[host]; !ok {
 		return
 	}
-	c.totalLoad = c.totalLoad - c.hosts[host].loadBound + load
+	c.totalLoad = c.totalLoad - c.hosts[host].LoadBound + load
 	c.hosts[host].LoadBound = load
 }
 func (c *Consistent) Hosts() []string {
@@ -181,7 +179,7 @@ func (c *Consistent) MaxLoad() int64 {
 	if avgLoadPerNode == 0 {
 		avgLoadPerNode = 1
 	}
-	avgLoadPerNode = math.Ceil(avgLoadPerNode * (1 + loadBoundFactor))
+	avgLoadPerNode = math.Ceil(avgLoadPerNode * (1 + LoadBoundFactor))
 	return int64(avgLoadPerNode)
 }
 
@@ -209,7 +207,7 @@ func (c *Consistent) checkLoadCapacity(host string) (bool, error) {
 	if avgLoadPerNode == 0 {
 		avgLoadPerNode = 1
 	}
-	avgLoadPerNode = math.Ceil(avgLoadPerNode * (1 + loadBoundFactor))
+	avgLoadPerNode = math.Ceil(avgLoadPerNode * (1 + LoadBoundFactor))
 
 	candidateHost, ok := c.hosts[host]
 	if !ok {

@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/dingqing/consistent-hash/core"
 	"github.com/dingqing/consistent-hash/proxy"
-	"net/http"
 )
 
 var (
@@ -22,8 +23,8 @@ func main() {
 func start(port string) {
 	http.HandleFunc("/register", registerHost)
 	http.HandleFunc("/unregister", unregisterHost)
-	http.HandleFunc("/host", GetHost)
-	http.HandleFunc("/hostCapacious", GetHostCapacious)
+	http.HandleFunc("/host", getHost)
+	http.HandleFunc("/hostCapacious", getHostCapacious)
 
 	fmt.Printf("start proxy server: %s\n", port)
 
@@ -43,7 +44,7 @@ func registerHost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("register host: %s success", r.Form["host"][0]))
+	fmt.Fprintf(w, fmt.Sprintf("register host: %s success", r.Form["host"][0]))
 }
 
 func unregisterHost(w http.ResponseWriter, r *http.Request) {
@@ -56,10 +57,11 @@ func unregisterHost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("unregister host: %s success", r.Form["host"][0]))
+	fmt.Fprintf(w, fmt.Sprintf("unregister host: %s success", r.Form["host"][0]))
 }
 
-func GetHost(w http.ResponseWriter, r *http.Request) {
+func getHost(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("hello")
 	_ = r.ParseForm()
 
 	val, err := p.GetHost(r.Form["key"][0])
@@ -69,18 +71,18 @@ func GetHost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("key: %s, val: %s", r.Form["key"][0], val))
+	fmt.Fprintf(w, fmt.Sprintf("key: %s, val: %s", r.Form["key"][0], val))
 }
 
-func GetHostCapacious(w http.ResponseWriter, r *http.Request) {
+func getHostCapacious(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseForm()
 
 	val, err := p.GetHostCapacious(r.Form["key"][0])
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprintf(w, err.Error())
+		fmt.Fprintf(w, err.Error())
 		return
 	}
 
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("key: %s, val: %s", r.Form["key"][0], val))
+	fmt.Fprintf(w, fmt.Sprintf("key: %s, val: %s", r.Form["key"][0], val))
 }
